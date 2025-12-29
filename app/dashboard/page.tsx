@@ -10,8 +10,9 @@ import { DustPanel } from '@/components/DustPanel';
 import { AlertList } from '@/components/AlertList';
 import { type ParameterType } from '@/lib/thresholds';
 
+
 // TODO: In production, allow user to select motor
-const DEFAULT_MOTOR_ID = 'default-motor-1';
+const DEFAULT_MOTOR_ID = 'motor_1';
 
 export default function DashboardPage() {
   const { data, isLoading, error, isConnected } = useRealtimeSensorData(DEFAULT_MOTOR_ID);
@@ -70,72 +71,86 @@ export default function DashboardPage() {
     <div className="min-h-screen">
       {/* Status Bar */}
       <RealtimeStatusBar
+        lastUpdate={
+          data?.latestReading?.timestamp
+            ? new Date(data.latestReading.timestamp)
+            : null
+        }
         isConnected={isConnected}
-        lastUpdate={latestReading.timestamp}
-        motorName={motor?.name || 'Unknown Motor'}
+        motorName={data?.motor?.name ?? "Unknown Motor"}
       />
-      
+
       {/* Dashboard Content */}
       <div className="container mx-auto px-4 py-6">
         {/* Motor Overview */}
         <div className="mb-6">
           <MotorOverviewCard
-            motorName={motor?.name || 'Motor AC'}
-            healthScore={latestHealth?.healthScoreMl || 85}
-            status={getMotorStatus(latestHealth?.healthScoreMl)}
-            operatingHoursToday={operatingHoursToday}
-            dailyEnergy={latestReading.dailyEnergyKwh}
+            motorName={data?.motor?.name ?? "Unknown Motor"}
+            healthScore={data?.latestHealth?.healthScoreMl ?? 0}
+            status={getMotorStatus(data?.latestHealth?.healthScoreMl)}
+            operatingHoursToday={8} // dummy dulu
+            dailyEnergy={0} // karena RTDB belum ada dailyEnergy
           />
         </div>
-        
+
         {/* Sensor Status Cards */}
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Electrical Parameters</h2>
+          <h2 className="text-xl font-bold text-gray-800 mb-4">
+            Electrical Parameters
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <SensorStatusCard
-              parameter={'gridVoltage' as ParameterType}
-              value={latestReading.gridVoltage}
-              history={getHistory('gridVoltage')}
+              parameter={"gridVoltage" as ParameterType}
+              value={data?.latestReading?.gridVoltage ?? 0}
+              history={getHistory("gridVoltage")}
             />
+
             <SensorStatusCard
-              parameter={'motorCurrent' as ParameterType}
-              value={latestReading.motorCurrent}
-              history={getHistory('motorCurrent')}
+              parameter={"motorCurrent" as ParameterType}
+              value={data?.latestReading?.motorCurrent ?? 0}
+              history={getHistory("motorCurrent")}
             />
+
             <SensorStatusCard
-              parameter={'powerFactor' as ParameterType}
-              value={latestReading.powerFactor}
-              history={getHistory('powerFactor')}
+              parameter={"vibrationRms" as ParameterType}
+              value={data?.latestReading?.vibrationRms ?? 0}
+              history={getHistory("vibrationRms")}
             />
+
             <SensorStatusCard
-              parameter={'gridFrequency' as ParameterType}
-              value={latestReading.gridFrequency}
-              history={getHistory('gridFrequency')}
+              parameter={"motorSurfaceTemp" as ParameterType}
+              value={data?.latestReading?.motorSurfaceTemp ?? 0}
+              history={getHistory("motorSurfaceTemp")}
             />
           </div>
         </div>
-        
+
         {/* Temperature & Vibration & Dust */}
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Physical Sensors</h2>
+          <h2 className="text-xl font-bold text-gray-800 mb-4">
+            Physical Sensors
+          </h2>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <TemperaturePanel
-              motorSurfaceTemp={latestReading.motorSurfaceTemp}
-              bearingTemp={latestReading.bearingTemp}
+              motorSurfaceTemp={data?.latestReading?.motorSurfaceTemp ?? 0}
+              bearingTemp={data?.latestReading?.bearingTemp ?? 0}
             />
+
             <VibrationPanel
-              vibrationRms={latestReading.vibrationRms}
-              faultFrequency={latestReading.faultFrequency || undefined}
-              rotorUnbalanceScore={latestReading.rotorUnbalanceScore}
-              bearingHealthScore={latestReading.bearingHealthScore}
+              vibrationRms={data?.latestReading?.vibrationRms ?? 0}
+              rotorUnbalanceScore={
+                data?.latestReading?.rotorUnbalanceScore ?? 0
+              }
+              bearingHealthScore={data?.latestReading?.bearingHealthScore ?? 0}
             />
+
             <DustPanel
-              dustDensity={latestReading.dustDensity}
-              soilingLossPercent={latestReading.soilingLossPercent}
+              dustDensity={data?.latestReading?.dustDensity ?? 0}
+              soilingLossPercent={data?.latestReading?.soilingLossPercent ?? 0}
             />
           </div>
         </div>
-        
+
         {/* Alerts */}
         <div className="mb-6">
           <AlertList alerts={activeAlerts} />
