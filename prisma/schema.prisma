@@ -6,9 +6,10 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite" // Change to "postgresql" for production
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 
 // Motor: Represents an AC motor being monitored
 model Motor {

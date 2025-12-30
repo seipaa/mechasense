@@ -33,14 +33,21 @@ export function formatDate(date: Date | string): string {
 /**
  * Format date to time only
  */
-export function formatTime(date: Date | string): string {
-  const d = typeof date === 'string' ? new Date(date) : date;
-  return d.toLocaleTimeString('id-ID', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
+export function formatTime(date?: Date | string | number): string {
+  if (!date) return "-";
+  const d =
+    typeof date === "number"
+      ? new Date(date)
+      : typeof date === "string"
+      ? new Date(date)
+      : date;
+  return d.toLocaleTimeString("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
   });
 }
+
 
 /**
  * Calculate time difference in human-readable format
