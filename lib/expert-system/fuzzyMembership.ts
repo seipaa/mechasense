@@ -14,9 +14,9 @@ export const fuzzyLevelToValue = (level: FuzzyLevel): number => {
     case 'Tidak':
       return 0.0;
     case 'Jarang':
-      return 0.4;
+      return 0.5;
     case 'Ya':
-      return 0.8;
+      return 1.0;
     default:
       return 0.0;
   }

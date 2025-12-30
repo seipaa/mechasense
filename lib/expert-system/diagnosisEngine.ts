@@ -15,37 +15,28 @@ export interface DiagnosisResult {
   confidence: number; // 0.0 - 1.0
 }
 
-/**
- * Jawaban user:
- * Tidak | Jarang | Ya
- */
 export type UserAnswer = FuzzyLevel;
 
-/**
- * Mapping jawaban user per symptom
- * key = symptomId
- */
 export type UserAnswers = Record<number, UserAnswer>;
 
 /* =======================
    DIAGNOSIS ENGINE
 ======================= */
 
-/**
- * Forward Chaining + Certainty Factor (MYCIN)
- */
 export function diagnoseForward(
   answers: UserAnswers
 ): DiagnosisResult[] {
 
-  /** 1️⃣ Hitung CF evidence */
+  /* =======================
+     1️⃣ HITUNG EVIDENCE CF
+  ======================= */
   const evidenceCF = new Map<number, number>();
 
   for (const symptom of symptoms) {
     const answer = answers[symptom.id];
     if (!answer) continue;
 
-    const cfUser = fuzzyLevelToValue(answer);   // 0.0 / 0.4 / 0.8
+    const cfUser = fuzzyLevelToValue(answer); // 0 / 0.4 / 0.8
     const cfEvidence = cfUser * symptom.cfExpert;
 
     if (cfEvidence > 0) {
@@ -53,10 +44,14 @@ export function diagnoseForward(
     }
   }
 
-  /** 2️⃣ Forward chaining */
-  const results: DiagnosisResult[] = [];
+  /* =======================
+     2️⃣ PROSES AND RULE (PRIORITAS)
+  ======================= */
+  const andResults: DiagnosisResult[] = [];
 
   for (const rule of rules) {
+    if (rule.operator !== "AND") continue;
+
     const cfList: number[] = [];
 
     for (const sid of rule.symptoms) {
@@ -65,31 +60,66 @@ export function diagnoseForward(
       }
     }
 
-    let ruleCF = 0;
+    // FULL MATCH AND
+    if (cfList.length === rule.symptoms.length) {
+      const ruleCF = Math.min(...cfList);
 
-    // AND → sekuensial
-    if (rule.operator === "AND" && cfList.length === rule.symptoms.length) {
-      ruleCF = Math.min(...cfList);
-    }
-
-    // OR → paralel
-    if (rule.operator === "OR" && cfList.length > 0) {
-      ruleCF = Math.max(...cfList);
-    }
-
-    if (ruleCF > 0) {
-      results.push({
-        level: rule.level,
-        damage: rule.damage,
-        solution: rule.solution,
-        confidence: Number(ruleCF.toFixed(3))
-      });
+      if (ruleCF > 0) {
+        andResults.push({
+          level: rule.level,
+          damage: rule.damage,
+          solution: rule.solution,
+          confidence: Number(ruleCF.toFixed(3))
+        });
+      }
     }
   }
 
-  /** 3️⃣ Prioritas level: C > B > A */
-  const priority = { C: 3, B: 2, A: 1 };
-  results.sort((a, b) => priority[b.level] - priority[a.level]);
+  // Jika AND rule ditemukan → ambil yang PALING SPESIFIK
+  if (andResults.length > 0) {
+    const priority = { C: 3, B: 2, A: 1 };
 
-  return results;
+    return andResults
+      .sort((a, b) => priority[b.level] - priority[a.level])
+      .slice(0, 1); // ambil 1 paling kuat
+  }
+
+  /* =======================
+     3️⃣ PROSES OR RULE (FALLBACK)
+  ======================= */
+  const orResults: DiagnosisResult[] = [];
+
+  for (const rule of rules) {
+    if (rule.operator !== "OR") continue;
+
+    const cfList: number[] = [];
+
+    for (const sid of rule.symptoms) {
+      if (evidenceCF.has(sid)) {
+        cfList.push(evidenceCF.get(sid)!);
+      }
+    }
+
+    if (cfList.length > 0) {
+      const ruleCF = Math.max(...cfList);
+
+      if (ruleCF > 0) {
+        orResults.push({
+          level: rule.level,
+          damage: rule.damage,
+          solution: rule.solution,
+          confidence: Number(ruleCF.toFixed(3))
+        });
+      }
+    }
+  }
+
+  /* =======================
+     4️⃣ SORT LEVEL PRIORITY
+  ======================= */
+  const priority = { C: 3, B: 2, A: 1 };
+
+  return orResults.sort(
+    (a, b) => priority[b.level] - priority[a.level]
+  );
 }

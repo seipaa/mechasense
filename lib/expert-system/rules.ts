@@ -32,7 +32,7 @@ export const rules: Rule[] = [
     operator: "OR",
     level: "A",
     damage: "Kapasitor / Gulungan / Supply Listrik",
-    solution: "Ganti kapasitor, cek kontinuitas gulungan, ukur supply listrik"
+    solution: "Ganti kapasitor, cek kontinuitas gulungan, ukur supply listrik, lakukan segera!"
   },
   {
     id: "R2",
@@ -40,7 +40,7 @@ export const rules: Rule[] = [
     operator: "OR",
     level: "B",
     damage: "Kapasitor",
-    solution: "Ganti kapasitor sesuai spesifikasi"
+    solution: "Ganti kapasitor sesuai spesifikasi, lakukan segera!"
   },
   {
     id: "R3",
@@ -48,7 +48,7 @@ export const rules: Rule[] = [
     operator: "OR",
     level: "A",
     damage: "Supply Listrik / Kapasitor",
-    solution: "Ukur tegangan, ganti kapasitor"
+    solution: "Ukur tegangan, ganti kapasitor, lakukan segera!"
   },
   {
     id: "R4",
@@ -56,7 +56,7 @@ export const rules: Rule[] = [
     operator: "OR",
     level: "B",
     damage: "Gulungan",
-    solution: "Kurangi beban, lakukan rewinding"
+    solution: "Kurangi beban, lakukan rewinding, lakukan segera!"
   },
   {
     id: "R5",
@@ -64,7 +64,7 @@ export const rules: Rule[] = [
     operator: "OR",
     level: "C",
     damage: "Gulungan terbakar",
-    solution: "Rewinding, cek cooling fan"
+    solution: "Rewinding, cek cooling fan, lakukan sekarang!"
   },
   {
     id: "R6",
@@ -72,7 +72,7 @@ export const rules: Rule[] = [
     operator: "OR",
     level: "B",
     damage: "Kelistrikan (Supply)",
-    solution: "Ukur arus, perbaiki instalasi"
+    solution: "Ukur arus, perbaiki instalasi, lakukan segera!"
   },
   {
     id: "R7",
@@ -80,7 +80,7 @@ export const rules: Rule[] = [
     operator: "OR",
     level: "B",
     damage: "Bearing",
-    solution: "Alignment, greasing, atau ganti bearing"
+    solution: "Alignment, greasing, atau ganti bearing, lakukan segera!"
   },
   {
     id: "R8",
@@ -88,7 +88,7 @@ export const rules: Rule[] = [
     operator: "OR",
     level: "C",
     damage: "Mekanis",
-    solution: "Cek komponen motor terutama bagian yang bergerak"
+    solution: "Cek komponen motor terutama bagian yang bergerak, lakukan sekarang!"
   },
   {
     id: "R9",
@@ -96,7 +96,7 @@ export const rules: Rule[] = [
     operator: "OR",
     level: "C",
     damage: "Kapasitor",
-    solution: "Ganti kapasitor"
+    solution: "Ganti kapasitor, lakukan sekarang!"
   },
   {
     id: "R10",
@@ -104,7 +104,7 @@ export const rules: Rule[] = [
     operator: "OR",
     level: "B",
     damage: "Kapasitor / Gulungan",
-    solution: "Ukur kapasitor dan resistansi gulungan"
+    solution: "Ukur kapasitor dan resistansi gulungan, lakukan segera!"
   },
 
   /* ===============================
@@ -117,7 +117,7 @@ export const rules: Rule[] = [
     operator: "AND",
     level: "C",
     damage: "Kapasitor terbakar",
-    solution: "Ganti kapasitor"
+    solution: "Ganti kapasitor, lakukan sekarang!"
   },
   {
     id: "R12",
@@ -125,6 +125,30 @@ export const rules: Rule[] = [
     operator: "AND",
     level: "C",
     damage: "Gearbox miring",
-    solution: "Benarkan posisi gearbox"
+    solution: "Benarkan posisi gearbox, lakukan sekarang!"
+  },
+  {
+    id: "R13",
+    symptoms: [4,6],
+    operator: "AND",
+    level: "B",
+    damage: "Kerusakan pada wiring",
+    solution: "Periksa Wiring Segera, lakukan segera!",
+  },
+  {
+    id: "R14",
+    symptoms: [5,6],
+    operator: "AND",
+    level: "B",
+    damage: "Kerusakan pada mekanik",
+    solution: "Periksa Beban dan Daya segera! biasanya overload, lakukan segera!",
+  },
+  {
+    id: "R15",
+    symptoms: [5,4,6],
+    operator: "AND",
+    level: "B",
+    damage: "Kerusakan pada mekanik",
+    solution: "Periksa Wiring, lakkukan segera!",
   }
 ];
